@@ -31,7 +31,7 @@ characters = [
     "🤖 Kokichi Muta",
     "🌸 Kasumi Miwa",
     "🕶 Kento Nanami",
-    "🩺 Shoko leiri",
+    "🩺 Shoko ieiri",
     "🧸 Masamichi Yaga",
     "📋 Kiyataka Ijichi",
     "🥋 Takuma Ino",
