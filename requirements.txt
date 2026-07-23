@@ -1,3 +1,2 @@
 aiogram==3.21.0
 aiofiles
-pydantic-core==2.33.2
