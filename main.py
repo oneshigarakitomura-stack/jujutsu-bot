@@ -8,522 +8,483 @@ from aiogram.filters import CommandStart
 from aiogram.types import Message, CallbackQuery, FSInputFile
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
+=========================
 
-# =========================
-# Render Web Server
-# =========================
+Render Web Server
 
-app = Flask(__name__)
+=========================
 
+app = Flask(name)
 
 @app.route("/")
 def home():
-    return "Jujutsu Bot is running!"
-
+return "Jujutsu Bot is running!"
 
 def run_web():
-    port = int(os.environ.get("PORT", 10000))
-    app.run(host="0.0.0.0", port=port)
-
+port = int(os.environ.get("PORT", 10000))
+app.run(host="0.0.0.0", port=port)
 
 def keep_alive():
-    t = Thread(target=run_web)
-    t.start()
+t = Thread(target=run_web, daemon=True)
+t.start()
 
+=========================
 
-# =========================
-# Bot
-# =========================
+Bot
+
+=========================
 
 TOKEN = os.getenv("BOT_TOKEN")
 
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
 
+=========================
 
-# =========================
-# Characters
-# =========================
+Characters
+
+=========================
 
 characters = [
-    "👊 Yuji Itadori",
-    "⚡ Satoru Gojo",
-    "🐺 Megumi Fushiguro",
-    "🔨 Nobara Kugisaki",
-    "🗡 Maki Zen'in",
-    "🐍 Toge Inumaki",
-    "🐼 Panda",
-    "💪 Aoi Todo",
-    "🏹 Noritoshi Kamo",
-    "🧹 Momo Nishimiya",
-    "🔫 Mai Zen'in",
-    "🤖 Kokichi Muta",
-    "🌸 Kasumi Miwa",
-    "🕶 Kento Nanami",
-    "🩺 Shoko Ieiri",
-    "🧸 Masamichi Yaga",
-    "📋 Kiyotaka Ijichi",
-    "🥋 Takuma Ino",
-    "🌋 Jogo",
-    "🌿 Hanami",
-    "🦋 Mahito",
-    "👴 Yoshinobu Gakuganji",
-    "💰 Mei Mei",
-    "🎒 Junpei Yoshino",
-    "🧠 Kenjaku",
-    "👑 Ryomen Sukuna",
-    "🏯 Naobito Zen'in",
-    "❄️ Uraume",
-    "🎯 Saki Rindo",
-    "🌌 Kaito Yuki",
-    "⚔️ Yuta Okkotsu",
-    "🩸 Choso",
-    "🌊 Miguel",
-    "🖤 Suguru Geto",
-    "🥷 Atsuya Kusakabe",
-    "👹 Toji Fushiguro",
-    "🐙 Dagon",
-    "🦾 Eiji Urushi"
+"👊 Yuji Itadori",
+"⚡ Satoru Gojo",
+"🐺 Megumi Fushiguro",
+"🔨 Nobara Kugisaki",
+"🗡 Maki Zen'in",
+"🐍 Toge Inumaki",
+"🐼 Panda",
+"💪 Aoi Todo",
+"🏹 Noritoshi Kamo",
+"🧹 Momo Nishimiya",
+"🔫 Mai Zen'in",
+"🤖 Kokichi Muta",
+"🌸 Kasumi Miwa",
+"🕶 Kento Nanami",
+"🩺 Shoko Ieiri",
+"🧸 Masamichi Yaga",
+"📋 Kiyotaka Ijichi",
+"🥋 Takuma Ino",
+"🌋 Jogo",
+"🌿 Hanami",
+"🦋 Mahito",
+"👴 Yoshinobu Gakuganji",
+"💰 Mei Mei",
+"🎒 Junpei Yoshino",
+"🧠 Kenjaku",
+"👑 Ryomen Sukuna",
+"🏯 Naobito Zen'in",
+"❄️ Uraume",
+"🎯 Saki Rindo",
+"🌌 Kaito Yuki",
+"⚔️ Yuta Okkotsu",
+"🩸 Choso",
+"🌊 Miguel",
+"🖤 Suguru Geto",
+"🥷 Atsuya Kusakabe",
+"👹 Toji Fushiguro",
+"🐙 Dagon",
+"🦾 Eiji Urushi"
 ]
 
+=========================
 
-# =========================
-# Clean Character Name
-# =========================
+Clean Character Name
+
+=========================
 
 def clean_name(name):
 
-    for x in "👊⚡🐺🔨🗡🐍🐼💪🏹🧹🔫🤖🌸🕶🩺🧸📋🥋🌋🌿🦋👴💰🎒🧠👑🏯❄️🎯🌌⚔️🩸🌊🖤🥷👹🐙🦾":
-        name = name.replace(x, "")
+emojis = (
+    "👊⚡🐺🔨🗡🐍🐼💪🏹🧹🔫🤖🌸🕶🩺🧸📋🥋"
+    "🌋🌿🦋👴💰🎒🧠👑🏯❄️🎯🌌⚔️🩸🌊🖤🥷👹🐙🦾"
+)
 
-    return name.strip().lower().replace(" ", "_").replace("'", "")
+for emoji in emojis:
+    name = name.replace(emoji, "")
 
+return (
+    name
+    .strip()
+    .lower()
+    .replace(" ", "_")
+    .replace("'", "")
+)
 
-# =========================
-# Find Images
-# =========================
+=========================
 
-def find_images(character, class_name, color):
+Find Images
 
-    name = clean_name(character)
+=========================
 
-    result = []
+def find_images(character, color):
 
-    if os.path.exists("images"):
+name = clean_name(character)
 
-        for file in os.listdir("images"):
+result = []
 
-            if file.startswith(
-                f"{name}_{class_name}_{color}_"
-            ) and file.endswith(".jpg"):
+if os.path.exists("images"):
 
-                result.append(
-                    "images/" + file
-                )
+    for file in os.listdir("images"):
 
-    return result
+        if file.startswith(
+            f"{name}_{color}_"
+        ) and file.endswith(".jpg"):
 
+            result.append(
+                os.path.join("images", file)
+            )
 
-# =========================
-# Character Menu
-# =========================
+result.sort()
+
+return result
+
+=========================
+
+Character Menu
+
+=========================
 
 def character_menu(page=0):
 
-    per_page = 8
+per_page = 8
 
-    start = page * per_page
-    end = start + per_page
+start = page * per_page
+end = start + per_page
 
-    buttons = []
+buttons = []
 
-    for i, name in enumerate(
-        characters[start:end],
-        start
-    ):
+for i, name in enumerate(
+    characters[start:end],
+    start
+):
 
-        buttons.append([
+    buttons.append([
 
-            InlineKeyboardButton(
-                text=name,
-                callback_data=f"char_{i}"
-            )
+        InlineKeyboardButton(
+            text=name,
+            callback_data=f"char_{i}"
+        )
 
-        ])
-
-
-    if start > 0:
-
-        buttons.append([
-
-            InlineKeyboardButton(
-                text="⬅️ قبلی",
-                callback_data=f"page_{page - 1}"
-            )
-
-        ])
+    ])
 
 
-    if end < len(characters):
-
-        buttons.append([
-
-            InlineKeyboardButton(
-                text="بعدی ➡️",
-                callback_data=f"page_{page + 1}"
-            )
-
-        ])
+navigation = []
 
 
-    return InlineKeyboardMarkup(
-        inline_keyboard=buttons
+if page > 0:
+
+    navigation.append(
+
+        InlineKeyboardButton(
+            text="⬅️ Previous",
+            callback_data=f"page_{page - 1}"
+        )
+
     )
 
 
-# =========================
-# Class Menu
-# =========================
+if end < len(characters):
+
+    navigation.append(
+
+        InlineKeyboardButton(
+            text="Next ➡️",
+            callback_data=f"page_{page + 1}"
+        )
+
+    )
+
+
+if navigation:
+
+    buttons.append(navigation)
+
+
+return InlineKeyboardMarkup(
+    inline_keyboard=buttons
+)
+
+=========================
+
+Class Menu
+
+=========================
 
 def class_menu(index):
 
-    return InlineKeyboardMarkup(
+return InlineKeyboardMarkup(
 
-        inline_keyboard=[
+    inline_keyboard=[
 
-            [
+        [
 
-                InlineKeyboardButton(
-                    text="⚔️ Class 1",
-                    callback_data=f"class_{index}_class1"
-                )
+            InlineKeyboardButton(
+                text="🔵 Blue",
+                callback_data=f"color_{index}_blue"
+            )
 
-            ],
+        ],
 
-            [
+        [
 
-                InlineKeyboardButton(
-                    text="🔥 Class 2",
-                    callback_data=f"class_{index}_class2"
-                )
+            InlineKeyboardButton(
+                text="🔴 Red",
+                callback_data=f"color_{index}_red"
+            )
 
-            ],
+        ],
 
-            [
+        [
 
-                InlineKeyboardButton(
-                    text="💀 Class 3",
-                    callback_data=f"class_{index}_class3"
-                )
+            InlineKeyboardButton(
+                text="🟢 Green",
+                callback_data=f"color_{index}_green"
+            )
 
-            ]
+        ],
 
-        ]
+        [
 
-    )
-
-
-# =========================
-# Color Menu
-# =========================
-
-def color_menu(index, class_name):
-
-    return InlineKeyboardMarkup(
-
-        inline_keyboard=[
-
-            [
-
-                InlineKeyboardButton(
-                    text="🔵 Blue",
-                    callback_data=f"color_{index}_{class_name}_blue"
-                )
-
-            ],
-
-            [
-
-                InlineKeyboardButton(
-                    text="🔴 Red",
-                    callback_data=f"color_{index}_{class_name}_red"
-                )
-
-            ],
-
-            [
-
-                InlineKeyboardButton(
-                    text="🟢 Green",
-                    callback_data=f"color_{index}_{class_name}_green"
-                )
-
-            ],
-
-            [
-
-                InlineKeyboardButton(
-                    text="🟡 Yellow",
-                    callback_data=f"color_{index}_{class_name}_yellow"
-                )
-
-            ]
+            InlineKeyboardButton(
+                text="🟡 Yellow",
+                callback_data=f"color_{index}_yellow"
+            )
 
         ]
 
-    )
+    ]
 
+)
 
-# =========================
-# Version Menu
-# =========================
+=========================
+
+Version Menu
+
+=========================
 
 def version_menu(count):
 
-    buttons = []
+buttons = []
 
-    for i in range(count):
+for i in range(count):
 
-        buttons.append([
+    buttons.append([
 
-            InlineKeyboardButton(
-                text=f"Version {i + 1}",
-                callback_data=f"version_{i}"
-            )
+        InlineKeyboardButton(
+            text=f"Version {i + 1}",
+            callback_data=f"version_{i}"
+        )
 
-        ])
-
-
-    return InlineKeyboardMarkup(
-        inline_keyboard=buttons
-    )
+    ])
 
 
-# =========================
-# Selected Images
-# =========================
+return InlineKeyboardMarkup(
+    inline_keyboard=buttons
+)
+
+=========================
+
+Selected Images
+
+=========================
 
 selected_images = {}
 
+=========================
 
-# =========================
-# Start Command
-# =========================
+Start Command
+
+=========================
 
 @dp.message(CommandStart())
 async def start(message: Message):
 
-    await message.answer(
+await message.answer(
 
-        "🎮 Select a Jujutsu Kaisen character:",
+    "🎮 Select a Jujutsu Kaisen character:",
 
-        reply_markup=character_menu()
+    reply_markup=character_menu()
+
+)
+
+=========================
+
+Callback Handler
+
+=========================
+
+@dp.callback_query()
+async def callback(call: CallbackQuery):
+
+data = call.data
+
+
+# =========================
+# Page
+# =========================
+
+if data.startswith("page_"):
+
+    page = int(
+        data.split("_")[1]
+    )
+
+
+    await call.message.edit_reply_markup(
+
+        reply_markup=character_menu(page)
 
     )
 
 
 # =========================
-# Callback Handler
+# Character
 # =========================
 
-@dp.callback_query()
-async def callback(call: CallbackQuery):
+elif data.startswith("char_"):
 
-    data = call.data
-
-
-    # =========================
-    # Page
-    # =========================
-
-    if data.startswith("page_"):
-
-        page = int(
-            data.split("_")[1]
-        )
+    index = int(
+        data.split("_")[1]
+    )
 
 
-        await call.message.edit_reply_markup(
+    await call.message.answer(
 
-            reply_markup=character_menu(page)
+        f"{characters[index]}\n\n"
+        f"⚔️ Select Class:",
 
-        )
+        reply_markup=class_menu(index)
 
-
-    # =========================
-    # Character
-    # =========================
-
-    elif data.startswith("char_"):
-
-        index = int(
-            data.split("_")[1]
-        )
+    )
 
 
-        await call.message.answer(
+# =========================
+# Class
+# =========================
 
-            f"{characters[index]}\n\n⚔️ Select Class:",
+elif data.startswith("color_"):
 
-            reply_markup=class_menu(index)
+    parts = data.split("_")
 
-        )
+    index = int(parts[1])
+
+    color = parts[2]
 
 
-    # =========================
-    # Class
-    # =========================
+    images = find_images(
 
-    elif data.startswith("class_"):
+        characters[index],
 
-        parts = data.split("_")
+        color
 
-        index = int(parts[1])
+    )
 
-        class_name = parts[2]
 
+    if not images:
 
         await call.message.answer(
 
-            f"{characters[index]}\n"
-            f"⚔️ {class_name}\n\n"
-            f"🎨 Select Color:",
-
-            reply_markup=color_menu(
-                index,
-                class_name
-            )
+            "❌ Image not found"
 
         )
 
 
-    # =========================
-    # Color
-    # =========================
+    elif len(images) == 1:
 
-    elif data.startswith("color_"):
+        photo = FSInputFile(
 
-        parts = data.split("_")
-
-
-        index = int(parts[1])
-
-        class_name = parts[2]
-
-        color = parts[3]
-
-
-        images = find_images(
-
-            characters[index],
-
-            class_name,
-
-            color
+            images[0]
 
         )
 
 
-        if len(images) == 0:
+        await call.message.answer_photo(
 
-            await call.message.answer(
-
-                "❌ Image not found"
-
-            )
-
-
-        elif len(images) == 1:
-
-            photo = FSInputFile(
-
-                images[0]
-
-            )
-
-
-            await call.message.answer_photo(
-
-                photo=photo
-
-            )
-
-
-        else:
-
-            selected_images[
-
-                call.from_user.id
-
-            ] = images
-
-
-            await call.message.answer(
-
-                "📸 Select Version:",
-
-                reply_markup=version_menu(
-
-                    len(images)
-
-                )
-
-            )
-
-
-    # =========================
-    # Version
-    # =========================
-
-    elif data.startswith("version_"):
-
-        index = int(
-
-            data.split("_")[1]
+            photo=photo
 
         )
 
 
-        images = selected_images.get(
+    else:
+
+        selected_images[
 
             call.from_user.id
 
+        ] = images
+
+
+        await call.message.answer(
+
+            "📸 Select Version:",
+
+            reply_markup=version_menu(
+
+                len(images)
+
+            )
+
         )
 
 
-        if images and index < len(images):
-
-            photo = FSInputFile(
-
-                images[index]
-
-            )
-
-
-            await call.message.answer_photo(
-
-                photo=photo
-
-            )
-
-
 # =========================
-# Main
+# Version
 # =========================
+
+elif data.startswith("version_"):
+
+    version_index = int(
+
+        data.split("_")[1]
+
+    )
+
+
+    images = selected_images.get(
+
+        call.from_user.id
+
+    )
+
+
+    if images and version_index < len(images):
+
+        photo = FSInputFile(
+
+            images[version_index]
+
+        )
+
+
+        await call.message.answer_photo(
+
+            photo=photo
+
+        )
+
+
+await call.answer()
+
+=========================
+
+Main
+
+=========================
 
 async def main():
 
-    print("BOT STARTED")
+print("BOT STARTED")
 
-    await dp.start_polling(bot)
+await dp.start_polling(bot)
 
+=========================
 
-# =========================
-# Start Everything
-# =========================
+Start Everything
 
-if __name__ == "__main__":
+=========================
 
-    keep_alive()
+if name == "main":
 
-    asyncio.run(main())
+keep_alive()
+
+asyncio.run(main())
