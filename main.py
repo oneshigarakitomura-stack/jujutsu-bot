@@ -1,20 +1,49 @@
 import asyncio
 import os
+from threading import Thread
 
+from flask import Flask
 from aiogram import Bot, Dispatcher
 from aiogram.filters import CommandStart
 from aiogram.types import Message, CallbackQuery, FSInputFile
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 
-import os
+# =========================
+# Render Web Server
+# =========================
+
+app = Flask(__name__)
+
+
+@app.route("/")
+def home():
+    return "Jujutsu Bot is running!"
+
+
+def run_web():
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host="0.0.0.0", port=port)
+
+
+def keep_alive():
+    t = Thread(target=run_web)
+    t.start()
+
+
+# =========================
+# Bot
+# =========================
 
 TOKEN = os.getenv("BOT_TOKEN")
-
 
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
 
+
+# =========================
+# Characters
+# =========================
 
 characters = [
     "👊 Yuji Itadori",
@@ -58,12 +87,21 @@ characters = [
 ]
 
 
+# =========================
+# Clean Character Name
+# =========================
+
 def clean_name(name):
+
     for x in "👊⚡🐺🔨🗡🐍🐼💪🏹🧹🔫🤖🌸🕶🩺🧸📋🥋🌋🌿🦋👴💰🎒🧠👑🏯❄️🎯🌌⚔️🩸🌊🖤🥷👹🐙🦾":
         name = name.replace(x, "")
 
     return name.strip().lower().replace(" ", "_").replace("'", "")
 
+
+# =========================
+# Find Images
+# =========================
 
 def find_images(character, color):
 
@@ -74,12 +112,21 @@ def find_images(character, color):
 
         for file in os.listdir("images"):
 
-            if file.startswith(f"{name}_{color}_") and file.endswith(".jpg"):
+            if file.startswith(
+                f"{name}_{color}_"
+            ) and file.endswith(".jpg"):
 
-                result.append("images/" + file)
+                result.append(
+                    "images/" + file
+                )
 
     return result
-    
+
+
+# =========================
+# Character Menu
+# =========================
+
 def character_menu(page=0):
 
     per_page = 8
@@ -89,7 +136,10 @@ def character_menu(page=0):
 
     buttons = []
 
-    for i, name in enumerate(characters[start:end], start):
+    for i, name in enumerate(
+        characters[start:end],
+        start
+    ):
 
         buttons.append([
             InlineKeyboardButton(
@@ -99,18 +149,20 @@ def character_menu(page=0):
         ])
 
     if start > 0:
+
         buttons.append([
             InlineKeyboardButton(
                 text="⬅️ قبلی",
-                callback_data=f"page_{page-1}"
+                callback_data=f"page_{page - 1}"
             )
         ])
 
     if end < len(characters):
+
         buttons.append([
             InlineKeyboardButton(
                 text="بعدی ➡️",
-                callback_data=f"page_{page+1}"
+                callback_data=f"page_{page + 1}"
             )
         ])
 
@@ -119,39 +171,52 @@ def character_menu(page=0):
     )
 
 
+# =========================
+# Color Menu
+# =========================
 
 def color_menu(index):
 
     return InlineKeyboardMarkup(
+
         inline_keyboard=[
+
             [
                 InlineKeyboardButton(
                     text="🔵 آبی",
                     callback_data=f"color_{index}_blue"
                 )
             ],
+
             [
                 InlineKeyboardButton(
                     text="🔴 قرمز",
                     callback_data=f"color_{index}_red"
                 )
             ],
+
             [
                 InlineKeyboardButton(
                     text="🟢 سبز",
                     callback_data=f"color_{index}_green"
                 )
             ],
+
             [
                 InlineKeyboardButton(
                     text="🟡 زرد",
                     callback_data=f"color_{index}_yellow"
                 )
             ]
+
         ]
+
     )
 
 
+# =========================
+# Version Menu
+# =========================
 
 def version_menu(count):
 
@@ -160,10 +225,12 @@ def version_menu(count):
     for i in range(count):
 
         buttons.append([
+
             InlineKeyboardButton(
-                text=f"نسخه {i+1}",
+                text=f"نسخه {i + 1}",
                 callback_data=f"version_{i}"
             )
+
         ])
 
     return InlineKeyboardMarkup(
@@ -171,17 +238,32 @@ def version_menu(count):
     )
 
 
+# =========================
+# Selected Images
+# =========================
 
 selected_images = {}
+
+
+# =========================
+# Start Command
+# =========================
+
 @dp.message(CommandStart())
 async def start(message: Message):
 
     await message.answer(
+
         "🎮 انتخاب کاراکتر Jujutsu Kaisen:",
+
         reply_markup=character_menu()
+
     )
 
 
+# =========================
+# Callback Handler
+# =========================
 
 @dp.callback_query()
 async def callback(call: CallbackQuery):
@@ -189,82 +271,147 @@ async def callback(call: CallbackQuery):
     data = call.data
 
 
+    # -------------------------
+    # Page
+    # -------------------------
+
     if data.startswith("page_"):
 
-        page = int(data.split("_")[1])
-
-        await call.message.edit_reply_markup(
-            reply_markup=character_menu(page)
+        page = int(
+            data.split("_")[1]
         )
 
+        await call.message.edit_reply_markup(
+
+            reply_markup=character_menu(page)
+
+        )
+
+
+    # -------------------------
+    # Character
+    # -------------------------
 
     elif data.startswith("char_"):
 
-        index = int(data.split("_")[1])
-
-        await call.message.answer(
-            f"{characters[index]}\n\n🎨 رنگ را انتخاب کن:",
-            reply_markup=color_menu(index)
+        index = int(
+            data.split("_")[1]
         )
 
+        await call.message.answer(
+
+            f"{characters[index]}\n\n🎨 رنگ را انتخاب کن:",
+
+            reply_markup=color_menu(index)
+
+        )
+
+
+    # -------------------------
+    # Color
+    # -------------------------
 
     elif data.startswith("color_"):
 
         parts = data.split("_")
 
         index = int(parts[1])
+
         color = parts[2]
 
+
         images = find_images(
+
             characters[index],
+
             color
+
         )
 
 
         if len(images) == 0:
 
             await call.message.answer(
+
                 "❌ عکس پیدا نشد"
+
             )
 
 
         elif len(images) == 1:
 
-            photo = FSInputFile(images[0])
+            photo = FSInputFile(
+
+                images[0]
+
+            )
 
             await call.message.answer_photo(
+
                 photo=photo
+
             )
 
 
         else:
 
-            selected_images[call.from_user.id] = images
+            selected_images[
+                call.from_user.id
+            ] = images
+
 
             await call.message.answer(
+
                 "📸 نسخه را انتخاب کن:",
-                reply_markup=version_menu(len(images))
+
+                reply_markup=version_menu(
+
+                    len(images)
+
+                )
+
             )
 
+
+    # -------------------------
+    # Version
+    # -------------------------
 
     elif data.startswith("version_"):
 
-        index = int(data.split("_")[1])
+        index = int(
 
-        images = selected_images.get(
-            call.from_user.id
+            data.split("_")[1]
+
         )
 
 
-        if images:
+        images = selected_images.get(
 
-            photo = FSInputFile(images[index])
+            call.from_user.id
 
-            await call.message.answer_photo(
-                photo=photo
+        )
+
+
+        if images and index < len(images):
+
+            photo = FSInputFile(
+
+                images[index]
+
             )
 
 
+            await call.message.answer_photo(
+
+                photo=photo
+
+            )
+
+
+# =========================
+# Main
+# =========================
 
 async def main():
 
@@ -273,5 +420,12 @@ async def main():
     await dp.start_polling(bot)
 
 
+# =========================
+# Start Everything
+# =========================
 
-asyncio.run(main())
+if __name__ == "__main__":
+
+    keep_alive()
+
+    asyncio.run(main())
