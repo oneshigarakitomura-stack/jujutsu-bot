@@ -33,7 +33,7 @@ characters = [
     "🕶 Kento Nanami",
     "🩺 Shoko ieiri",
     "🧸 Masamichi Yaga",
-    "📋 Kiyataka ijichi",
+    "📋 Kiyotaka ijichi",
     "🥋 Takuma Ino",
     "🌋 Jogo",
     "🌿 Hanami",
