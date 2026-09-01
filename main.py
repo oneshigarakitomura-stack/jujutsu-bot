@@ -86,7 +86,8 @@ characters = [
     "🥷 Atsuya Kusakabe",
     "👹 Toji Fushiguro",
     "🐙 Dagon",
-    "🦾 Eiji Urushi"
+    "🦾 Eiji Urushi",
+    "🏮 Burning Passion"
 ]
 # =========================
 # Clean Character Name
@@ -96,7 +97,7 @@ def clean_name(name):
 
     emojis = (
         "👊⚡🐺🔨🗡🐍🐼💪🏹🧹🔫🤖🌸🕶🩺🧸📋🥋"
-        "🌋🌿🦋👴💰🎒🧠👑🏯❄️🎯🌌⚔️🩸🌊🖤🥷👹🐙🦾"
+        "🌋🌿🦋👴💰🎒🧠👑🏯❄️🎯🌌⚔️🩸🌊🖤🥷👹🐙🦾🏮"
     )
 
     for emoji in emojis:
